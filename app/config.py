@@ -7,7 +7,7 @@ class Settings(BaseSettings):
 
     # App
     APP_NAME: str = "CareldPOS"
-    APP_VERSION: str = "1.0.0"
+    APP_VERSION: str = "0.3.1"
     DEBUG: bool = True
 
     # Server
