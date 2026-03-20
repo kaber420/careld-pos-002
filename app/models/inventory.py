@@ -1,9 +1,12 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from app.models.inventory import InventoryItem
+    from app.models.inventory import InventoryItem, InventoryMovement
+    from app.models.user import User
+    from app.models.repair import Repair
 
 
 class CategoryBase(SQLModel):
@@ -32,6 +35,38 @@ class Category(CategoryBase, table=True):
 
     # Relación con items
     items: list["InventoryItem"] = Relationship(back_populates="category", sa_relationship_kwargs={"lazy": "selectin"})  # type: ignore
+
+
+class MovementType(str, Enum):
+    """Tipos de movimiento de inventario"""
+    PURCHASE = "purchase"      # Entrada por compra
+    REPAIR = "repair"          # Salida por reparación
+    WITHDRAWAL = "withdrawal"  # Salida general (ej: uso interno)
+    ADJUSTMENT = "adjustment"  # Ajuste manual (inventario físico)
+    LOSS = "loss"              # Pérdida/Robo
+    DAMAGED = "damaged"        # Producto dañado/defectuoso
+
+
+class InventoryMovement(SQLModel, table=True):
+    """Modelo para registrar historial de movimientos de inventario"""
+    __tablename__ = "inventory_movements"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    inventory_item_id: int = Field(foreign_key="inventory_items.id", index=True)
+    quantity: int = Field(...)  # Positivo = entrada, Negativo = salida
+    type: MovementType = Field(default=MovementType.ADJUSTMENT)
+    reason: Optional[str] = Field(default=None, max_length=255)
+    
+    # Referencias (opcionales)
+    user_id: Optional[int] = Field(default=None, foreign_key="users.id")
+    repair_id: Optional[int] = Field(default=None, foreign_key="repairs.id")
+    
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # Relaciones
+    item: Optional["InventoryItem"] = Relationship(back_populates="movements")  # type: ignore
+    user: Optional["User"] = Relationship()  # type: ignore
+    repair: Optional["Repair"] = Relationship()  # type: ignore
 
 
 class InventoryItemBase(SQLModel):
@@ -80,3 +115,4 @@ class InventoryItem(InventoryItemBase, table=True):
     # Relaciones
     category: Optional["Category"] = Relationship(back_populates="items")  # type: ignore
     repair_items: list["RepairItem"] = Relationship(back_populates="inventory_item", sa_relationship_kwargs={"lazy": "selectin"})  # type: ignore
+    movements: list["InventoryMovement"] = Relationship(back_populates="item", sa_relationship_kwargs={"lazy": "selectin", "cascade": "all, delete-orphan"})  # type: ignore

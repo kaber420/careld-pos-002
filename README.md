@@ -202,4 +202,5 @@ pytest
 
 ## 📄 Licencia
 
-MIT
+AGPL-3.0
+

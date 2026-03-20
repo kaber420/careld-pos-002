@@ -147,12 +147,22 @@ class RepairService:
         if unit_price is None:
             unit_price = inventory_item.unit_price
 
-        # Reducir stock
+        # Reducir stock y registrar movimiento
         if inventory_item.stock_quantity < quantity:
             raise ValueError("Insufficient stock")
 
         inventory_item.stock_quantity -= quantity
         self.session.add(inventory_item)
+
+        from app.models.inventory import InventoryMovement, MovementType
+        movement = InventoryMovement(
+            inventory_item_id=inventory_item.id,
+            quantity=-quantity,
+            type=MovementType.REPAIR,
+            reason=f"Repuesto para reparación {repair_id}",
+            repair_id=repair_id
+        )
+        self.session.add(movement)
 
         repair_item = RepairItem(
             repair_id=repair_id,

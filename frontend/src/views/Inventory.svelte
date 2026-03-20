@@ -10,6 +10,14 @@
   let showForm = false;
   let editingItem = null;
 
+  let showAdjustmentModal = false;
+  let adjustingItem = null;
+  let adjustmentData = {
+    quantity: 0,
+    type: 'withdrawal',
+    reason: ''
+  };
+
   let filters = {
     category_id: '',
     low_stock: false,
@@ -119,13 +127,35 @@
     }
   }
 
-  async function handleAdjustStock(item, adjustment) {
-    const quantity = prompt(`Ajustar stock de ${item.name}:\n(positivo para agregar, negativo para remover)`);
-    if (quantity === null || quantity === '') return;
+  function openAdjustmentModal(item) {
+    adjustingItem = item;
+    adjustmentData = {
+      quantity: 0,
+      type: 'withdrawal',
+      reason: ''
+    };
+    showAdjustmentModal = true;
+  }
+
+  function closeAdjustmentModal() {
+    showAdjustmentModal = false;
+    adjustingItem = null;
+  }
+
+  async function submitAdjustment() {
+    if (!adjustmentData.quantity || adjustmentData.quantity === 0) {
+        notify('Ingresa una cantidad válida', 'warning');
+        return;
+    }
 
     try {
-      await api.adjustStock(item.id, parseInt(quantity));
+      await api.adjustStock(adjustingItem.id, {
+        quantity: parseInt(adjustmentData.quantity),
+        type: adjustmentData.type,
+        reason: adjustmentData.reason
+      });
       notify('Stock actualizado correctamente', 'success');
+      closeAdjustmentModal();
       loadItems();
     } catch (error) {
       notify(error.message, 'danger');
@@ -282,7 +312,7 @@
                       </button>
                       <button
                         class="btn btn-sm btn-secondary"
-                        on:click={() => handleAdjustStock(item, 0)}
+                        on:click={() => openAdjustmentModal(item)}
                       >
                         ± Stock
                       </button>
@@ -384,6 +414,53 @@
             <button type="button" class="btn btn-outline" on:click={closeForm}>Cancelar</button>
             <button type="submit" class="btn btn-primary">
               {editingItem ? 'Actualizar' : 'Crear'} Item
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Adjustment Modal -->
+  {#if showAdjustmentModal}
+    <div class="modal-overlay" on:click|self={closeAdjustmentModal}>
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            Ajustar Stock: {adjustingItem?.name}
+          </h3>
+          <button class="modal-close" on:click={closeAdjustmentModal}>×</button>
+        </div>
+
+        <form on:submit|preventDefault={submitAdjustment}>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="label" for="adj_quantity">Cantidad (+ para agregar, - para restar) *</label>
+              <input id="adj_quantity" type="number" class="input" bind:value={adjustmentData.quantity} required />
+              <small class="text-sm text-light mt-1 block">Stock actual: {adjustingItem?.stock_quantity}</small>
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="adj_type">Motivo del Ajuste *</label>
+              <select id="adj_type" class="select" bind:value={adjustmentData.type} required>
+                <option value="withdrawal">Salida General (Uso interno)</option>
+                <option value="damaged">Producto Dañado/Defectuoso</option>
+                <option value="loss">Pérdida o Robo</option>
+                <option value="adjustment">Ajuste Manual (Inventario de rutina)</option>
+                <option value="purchase">Entrada por Compra</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="adj_reason">Notas adicionales</label>
+              <textarea id="adj_reason" class="textarea" bind:value={adjustmentData.reason} rows="3" placeholder="Ej: Se rompió pantalla al instalar, usado en local, etc."></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" on:click={closeAdjustmentModal}>Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+              Guardar Ajuste
             </button>
           </div>
         </form>

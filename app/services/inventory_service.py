@@ -1,6 +1,6 @@
 from typing import List, Optional
 from sqlmodel import Session, select
-from app.models.inventory import InventoryItem, Category
+from app.models.inventory import InventoryItem, Category, InventoryMovement, MovementType
 
 
 class InventoryService:
@@ -53,10 +53,13 @@ class InventoryService:
         self,
         item_id: int,
         quantity: int,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
+        movement_type: MovementType = MovementType.ADJUSTMENT,
+        user_id: Optional[int] = None,
+        repair_id: Optional[int] = None
     ) -> Optional[InventoryItem]:
         """
-        Ajustar stock de un item.
+        Ajustar stock de un item y registrar el movimiento.
         quantity positivo = agregar stock
         quantity negativo = remover stock
         """
@@ -70,6 +73,18 @@ class InventoryService:
 
         item.stock_quantity = new_quantity
         self.session.add(item)
+        
+        # Registrar el movimiento
+        movement = InventoryMovement(
+            inventory_item_id=item.id,
+            quantity=quantity,
+            type=movement_type,
+            reason=reason,
+            user_id=user_id,
+            repair_id=repair_id
+        )
+        self.session.add(movement)
+
         self.session.commit()
         self.session.refresh(item)
         return item

@@ -1,6 +1,15 @@
+import os
 from sqlmodel import SQLModel, create_engine, Session
 from sqlalchemy.orm import sessionmaker
 from app.config import settings
+
+# Asegurar que el directorio de la base de datos exista si es SQLite
+if settings.DATABASE_URL.startswith("sqlite:///"):
+    db_path = settings.DATABASE_URL.replace("sqlite:///", "")
+    # Si la ruta contiene directorios, crearlos
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
 
 engine = create_engine(
     settings.DATABASE_URL,

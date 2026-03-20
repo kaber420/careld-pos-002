@@ -33,7 +33,7 @@ dev = [
 ]
 
 [project.scripts]
-careldpos-start = "run:main"
+careldpos = "run:main"
 
 [tool.setuptools]
 packages = ["app"]

@@ -11,6 +11,7 @@ from app.schemas.inventory import (
     CategoryCreate,
     CategoryUpdate,
     CategoryResponse,
+    StockAdjustment,
 )
 from app.core.dependencies import get_current_user, require_role
 from app.services.inventory_service import InventoryService
@@ -228,30 +229,31 @@ def update_inventory_item(
 @router.post("/{item_id}/stock", response_model=InventoryItemResponse)
 def adjust_stock(
     item_id: int,
-    quantity: int = Query(..., description="Cantidad a ajustar (positivo para agregar, negativo para remover)"),
+    adjustment: StockAdjustment,
     current_user: User = Depends(require_role("admin", "inventory_manager")),
     session: Session = Depends(get_session)
 ):
-    """Ajustar stock de un item"""
-    item = session.get(InventoryItem, item_id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Item not found"
+    """Ajustar stock de un item y registrar el movimiento"""
+    inventory_service = InventoryService(session)
+    try:
+        item = inventory_service.adjust_stock(
+            item_id=item_id,
+            quantity=adjustment.quantity,
+            reason=adjustment.reason,
+            movement_type=adjustment.type,
+            user_id=current_user.id
         )
-
-    new_quantity = item.stock_quantity + quantity
-    if new_quantity < 0:
+        if not item:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Item not found"
+            )
+        return item
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Insufficient stock"
+            detail=str(e)
         )
-
-    item.stock_quantity = new_quantity
-    session.add(item)
-    session.commit()
-    session.refresh(item)
-    return item
 
 
 @router.delete("/{item_id}")

@@ -260,9 +260,10 @@ export const api = {
     });
   },
 
-  async adjustStock(id, quantity) {
-    return request(`/inventory/${id}/stock?quantity=${quantity}`, {
-      method: 'POST'
+  async adjustStock(id, data) {
+    return request(`/inventory/${id}/stock`, {
+      method: 'POST',
+      body: JSON.stringify(data)
     });
   },
 

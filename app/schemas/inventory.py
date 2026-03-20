@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.models.inventory import MovementType
+
 
 class CategoryBase(BaseModel):
     """Schema base de categoría"""
@@ -70,3 +72,24 @@ class InventoryItemResponse(InventoryItemBase):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class StockAdjustment(BaseModel):
+    """Schema para ajustar el stock de inventario"""
+    quantity: int = Field(description="Cantidad a ajustar (positivo para agregar, negativo para remover)")
+    type: MovementType = Field(default=MovementType.ADJUSTMENT, description="Tipo de movimiento")
+    reason: Optional[str] = Field(default=None, description="Motivo del ajuste")
+
+
+class InventoryMovementResponse(BaseModel):
+    """Schema de respuesta para historial de movimientos"""
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    inventory_item_id: int
+    quantity: int
+    type: MovementType
+    reason: Optional[str]
+    user_id: Optional[int]
+    repair_id: Optional[int]
+    created_at: datetime
