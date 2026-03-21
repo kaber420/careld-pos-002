@@ -15,6 +15,7 @@ class UserRole(str, Enum):
     TECHNICIAN = "technician" # Puede gestionar reparaciones
     RECEPTIONIST = "receptionist"  # Solo registro y atención
     INVENTORY_MANAGER = "inventory_manager"  # Gestión de inventario
+    PARTNER = "partner" # Socio comercial / Mayorista
 
 
 class UserBase(SQLModel):

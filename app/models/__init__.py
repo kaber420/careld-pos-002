@@ -6,6 +6,7 @@ from app.models.inventory import InventoryItem, Category
 from app.models.payment import Payment, PaymentMethod
 from app.models.sale import Sale, SaleItem
 from app.models.setting import Setting
+from app.models.partner_order import PartnerOrder, PartnerOrderItem, PartnerOrderStatus
 
 __all__ = [
     "User",
@@ -23,4 +24,7 @@ __all__ = [
     "Sale",
     "SaleItem",
     "Setting",
+    "PartnerOrder",
+    "PartnerOrderItem",
+    "PartnerOrderStatus",
 ]

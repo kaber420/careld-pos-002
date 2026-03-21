@@ -53,7 +53,12 @@
       user.set(userData);
       isAuthenticated.set(true);
       notify(`Bienvenido, ${userData.full_name}!`, 'success');
-      navigate('/dashboard');
+      
+      if (userData.role === 'partner') {
+        navigate('/partner-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       error = err.message;
     } finally {

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import Session, select
 from app.database import get_session
 from app.models.user import User, UserRole
-from app.models.repair import Repair, RepairStatus, RepairItem, Priority
+from app.models.repair import Repair, RepairStatus, RepairItem, Priority, RepairLog
 from app.models.device import Device, DeviceStatus
 from app.models.payment import Payment, PaymentMethod, PaymentStatus
 from app.schemas.repair import (
@@ -85,6 +85,7 @@ def create_repair(
         warranty_days=repair_data.warranty_days,
         device_id=repair_data.device_id,
         technician_id=repair_data.technician_id,
+        partner_id=repair_data.partner_id,
         repair_number=repair_number,
         portal_token=portal_token,
         portal_token_expires=portal_expires
@@ -95,6 +96,17 @@ def create_repair(
 
     session.add(repair)
     session.add(device)
+    
+    # Crear log inicial
+    initial_log = RepairLog(
+        repair_id=repair.id,
+        from_status=RepairStatus.PENDING,
+        to_status=RepairStatus.PENDING,
+        description="Equipo ingresado al sistema",
+        technician_id=current_user.id
+    )
+    session.add(initial_log)
+    
     session.commit()
     session.refresh(repair)
     return repair
@@ -164,6 +176,32 @@ def update_repair(
     # Manejar cambios de estado
     if "status" in update_data:
         new_status = update_data["status"]
+        old_status = repair.status
+        
+        if new_status != old_status:
+            # Crear log de cambio de estado
+            status_names = {
+                RepairStatus.PENDING: "Pendiente",
+                RepairStatus.DIAGNOSING: "En Diagnóstico",
+                RepairStatus.WAITING_APPROVAL: "Esperando Aprobación",
+                RepairStatus.IN_PROGRESS: "En Reparación",
+                RepairStatus.WAITING_PARTS: "Esperando Repuestos",
+                RepairStatus.COMPLETED: "Reparación Completada",
+                RepairStatus.DELIVERED: "Entregado",
+                RepairStatus.CANCELLED: "Cancelado"
+            }
+            
+            log_msg = f"Cambio de estado: {status_names.get(old_status, old_status)} -> {status_names.get(new_status, new_status)}"
+            
+            status_log = RepairLog(
+                repair_id=repair.id,
+                from_status=old_status,
+                to_status=new_status,
+                description=log_msg,
+                technician_id=current_user.id
+            )
+            session.add(status_log)
+
         if new_status == RepairStatus.IN_PROGRESS and not repair.started_at:
             repair.started_at = datetime.utcnow()
         
@@ -187,7 +225,17 @@ def update_repair(
             session.add(device)
 
     for field, value in update_data.items():
-        if value is not None:
+        if field == "partner_id":
+             # Validar que el socio existe si se proporciona
+             if value is not None:
+                 partner = session.get(User, value)
+                 if not partner or partner.role != UserRole.PARTNER:
+                     raise HTTPException(
+                         status_code=status.HTTP_400_BAD_REQUEST,
+                         detail="Invalid partner ID or user is not a partner"
+                     )
+             setattr(repair, field, value)
+        elif value is not None:
             setattr(repair, field, value)
 
     session.add(repair)
@@ -371,8 +419,11 @@ def get_repair_by_portal_token(
     session: Session = Depends(get_session)
 ):
     """Obtener reparación por token de portal (acceso público para clientes)"""
+    from sqlalchemy.orm import selectinload
     repair = session.exec(
-        select(Repair).where(Repair.portal_token == token)
+        select(Repair)
+        .where(Repair.portal_token == token)
+        .options(selectinload(Repair.device))
     ).first()
     
     if not repair:
@@ -389,6 +440,31 @@ def get_repair_by_portal_token(
         )
         
     return repair
+
+
+@router.get("/portal/{token}/history", response_model=List[dict])
+def get_repair_history_by_portal_token(
+    token: str,
+    session: Session = Depends(get_session)
+):
+    """Obtener el historial de cambios de estado por token de portal"""
+    repair = session.exec(
+        select(Repair).where(Repair.portal_token == token)
+    ).first()
+    
+    if not repair:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid or expired portal token"
+        )
+        
+    logs = session.exec(
+        select(RepairLog)
+        .where(RepairLog.repair_id == repair.id)
+        .order_by(RepairLog.created_at.asc())
+    ).all()
+    
+    return logs
 
 
 @router.get("/number/{repair_number}", response_model=RepairResponse)
@@ -475,3 +551,18 @@ def reject_repair_via_portal(
     session.commit()
     session.refresh(repair)
     return repair
+
+
+@router.get("/partner/my-devices", response_model=List[RepairResponse])
+def get_partner_repairs(
+    current_user: User = Depends(require_role(UserRole.PARTNER)),
+    session: Session = Depends(get_session)
+):
+    """Listar reparaciones vinculadas al socio comercial autenticado"""
+    repairs = session.exec(
+        select(Repair)
+        .where(Repair.partner_id == current_user.id)
+        .order_by(Repair.created_at.desc())
+    ).all()
+    return repairs
+

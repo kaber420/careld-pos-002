@@ -81,15 +81,17 @@ class Repair(RepairBase, table=True):
     # Portal access
     portal_token: Optional[str] = Field(default=None, unique=True, index=True)
     portal_token_expires: Optional[datetime] = Field(default=None)
+    partner_id: Optional[int] = Field(default=None, foreign_key="users.id")
 
     # Relaciones
-    device: Optional["Device"] = Relationship(back_populates="repairs")
+    device: Optional["Device"] = Relationship(back_populates="repairs", sa_relationship_kwargs={"lazy": "selectin"})
     technician: Optional["User"] = Relationship(
         back_populates="repairs_assigned",
         sa_relationship_kwargs={"foreign_keys": "[Repair.technician_id]"}
     )
     items: list["RepairItem"] = Relationship(back_populates="repair", sa_relationship_kwargs={"lazy": "selectin"})
     payments: list["Payment"] = Relationship(back_populates="repair", sa_relationship_kwargs={"lazy": "selectin"})
+    logs: list["RepairLog"] = Relationship(back_populates="repair", sa_relationship_kwargs={"lazy": "selectin"})
 
 
 class RepairItemBase(SQLModel):
@@ -125,3 +127,20 @@ class RepairItem(RepairItemBase, table=True):
     # Relaciones
     repair: Optional["Repair"] = Relationship(back_populates="items")  # type: ignore
     inventory_item: Optional["InventoryItem"] = Relationship()  # type: ignore
+
+
+class RepairLog(SQLModel, table=True):
+    """Historial detallado para la línea de tiempo"""
+    __tablename__ = "repair_logs"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    repair_id: int = Field(foreign_key="repairs.id", index=True)
+    from_status: RepairStatus
+    to_status: RepairStatus
+    description: str
+    technician_id: Optional[int] = Field(default=None, foreign_key="users.id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # Relaciones
+    repair: Optional["Repair"] = Relationship(back_populates="logs")
+    technician: Optional["User"] = Relationship()

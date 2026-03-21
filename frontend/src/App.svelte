@@ -16,6 +16,9 @@
   import NotFound from './views/NotFound.svelte';
   import ClientPortal from './views/ClientPortal.svelte';
   import Settings from './views/Settings.svelte';
+  import PartnerDashboard from './views/PartnerDashboard.svelte';
+  import PartnerOrders from './views/PartnerOrders.svelte';
+  import Users from './views/Users.svelte';
   import { fetchPublicSettings } from './stores/settings';
 
   let isLoading = true;
@@ -58,6 +61,9 @@
     <Route path="/pos" component={POS} />
     <Route path="/portal/:token" component={ClientPortal} />
     <Route path="/settings" component={Settings} />
+    <Route path="/users" component={Users} />
+    <Route path="/partner-dashboard" component={PartnerDashboard} />
+    <Route path="/partner-orders" component={PartnerOrders} />
     <Route path="*" component={NotFound} />
   </Router>
 {/if}

@@ -17,6 +17,8 @@ from app.api import (
     uploads_router,
     sales_router,
     settings_router,
+    partners_router,
+    partners_admin_router,
 )
 from app.api.settings import seed_settings
 from app.database import SessionLocal
@@ -66,6 +68,8 @@ app.include_router(payments_router, prefix="/api/v1/payments", tags=["Pagos"])
 app.include_router(sales_router, prefix="/api/v1/sales", tags=["Ventas"])
 app.include_router(uploads_router, prefix="/api/v1/uploads", tags=["Archivos"])
 app.include_router(settings_router, prefix="/api/v1/settings", tags=["Configuración"])
+app.include_router(partners_router, prefix="/api/v1", tags=["Socio"])
+app.include_router(partners_admin_router, prefix="/api/v1", tags=["Admin - Socios"])
 
 
 @app.get("/health", tags=["Health"])

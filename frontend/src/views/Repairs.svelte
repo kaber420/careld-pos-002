@@ -60,7 +60,8 @@
     priority: 'normal',
     status: 'pending',
     warranty_days: 30,
-    technician_id: ''
+    technician_id: '',
+    partner_id: ''
   };
 
   const statusLabels = {
@@ -127,7 +128,8 @@
         priority: repair.priority,
         status: repair.status,
         warranty_days: repair.warranty_days,
-        technician_id: repair.technician_id || ''
+        technician_id: repair.technician_id || '',
+        partner_id: repair.partner_id || ''
       };
       // Cargar refacciones de la reparación
       loadRepairItems(repair.id);
@@ -140,7 +142,8 @@
         estimated_cost: '',
         priority: 'normal',
         warranty_days: 30,
-        technician_id: ''
+        technician_id: '',
+        partner_id: ''
       };
       repairItems = [];
     }
@@ -557,9 +560,15 @@
       </div>
     </div>
 
-    <!-- Modal Form -->
     {#if showForm}
-      <div class="modal-overlay" on:click|self={closeForm}>
+      <div 
+        class="modal-overlay" 
+        on:click|self={closeForm}
+        on:keydown={(e) => e.key === 'Escape' && closeForm()}
+        role="button"
+        tabindex="0"
+        aria-label="Cerrar modal"
+      >
         <div class="modal modal-lg">
           <div class="modal-header">
             <h3 class="modal-title">
@@ -609,8 +618,6 @@
                     {/each}
                   </select>
                 </div>
-              </div>
-
               <div class="form-row">
                 <div class="form-group">
                   <label class="label" for="form_status">Estado de Reparación</label>
@@ -620,9 +627,17 @@
                     {/each}
                   </select>
                 </div>
-                
+
                 <div class="form-group">
-                  <!-- Espacio para mantener el layout de dos columnas si es necesario -->
+                  <label class="label" for="partner_id">Socio / Mayorista (Partner)</label>
+                  <select id="partner_id" class="select" bind:value={formData.partner_id}>
+                    <option value="">Ninguno (Cliente Final)</option>
+                    {#each users as user}
+                      {#if user.role === 'partner'}
+                        <option value={user.id}>{user.full_name}</option>
+                      {/if}
+                    {/each}
+                  </select>
                 </div>
               </div>
 
@@ -744,9 +759,15 @@
       </div>
     {/if}
 
-    <!-- Modal de Completar/Cobrar -->
     {#if showCompleteModal}
-      <div class="modal-overlay" on:click|self={() => showCompleteModal = false}>
+      <div 
+        class="modal-overlay" 
+        on:click|self={() => showCompleteModal = false}
+        on:keydown={(e) => e.key === 'Escape' && (showCompleteModal = false)}
+        role="button"
+        tabindex="0"
+        aria-label="Cerrar modal"
+      >
         <div class="modal modal-lg">
           <div class="modal-header">
             <h3 class="modal-title">💰 Completar Reparación - {selectedRepair?.repair_number}</h3>

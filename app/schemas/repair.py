@@ -54,6 +54,7 @@ class RepairCreate(RepairBase):
     """Schema para crear reparación"""
     device_id: int
     technician_id: Optional[int] = None
+    partner_id: Optional[int] = None
 
 
 class RepairUpdate(BaseModel):
@@ -66,7 +67,11 @@ class RepairUpdate(BaseModel):
     priority: Optional[Priority] = None
     status: Optional[RepairStatus] = None
     technician_id: Optional[int] = None
+    partner_id: Optional[int] = None
     warranty_days: Optional[int] = None
+
+
+from app.schemas.device import DeviceResponse
 
 
 class RepairResponse(RepairBase):
@@ -76,7 +81,9 @@ class RepairResponse(RepairBase):
     id: int
     repair_number: str
     device_id: int
+    device: Optional[DeviceResponse] = None
     technician_id: Optional[int]
+    partner_id: Optional[int] = None
     status: RepairStatus
     created_at: datetime
     updated_at: datetime

@@ -96,6 +96,19 @@ export const api = {
     return request('/users/');
   },
 
+  async updateUser(id, data) {
+    return request(`/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async deleteUser(id) {
+    return request(`/users/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
   // Clientes
   async getCustomers(params = {}) {
     // Solo incluir params que tengan valor
@@ -167,6 +180,10 @@ export const api = {
   async getRepairs(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     return request(`/repairs/${queryString ? '?' + queryString : ''}`);
+  },
+
+  async getPartnerRepairs() {
+    return request('/repairs/partner/my-devices');
   },
 
   async getRepair(id) {
@@ -347,6 +364,33 @@ export const api = {
     return request('/sales/', {
       method: 'POST',
       body: JSON.stringify(data)
+    });
+  },
+
+  // Socios (Partners)
+  async getPartnerInventory() {
+    return request('/partners/inventory');
+  },
+
+  async createPartnerOrder(orderData) {
+    return request('/partners/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData)
+    });
+  },
+
+  async getMyPartnerOrders() {
+    return request('/partners/orders');
+  },
+
+  // Admin - Pedidos de Socios
+  async getAllPartnerOrders() {
+    return request('/admin/partners/orders');
+  },
+
+  async updatePartnerOrderStatus(orderId, status) {
+    return request(`/admin/partners/orders/${orderId}/status?status=${status}`, {
+      method: 'PATCH'
     });
   },
 
