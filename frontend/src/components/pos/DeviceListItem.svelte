@@ -36,259 +36,69 @@
   }
 </script>
 
-<div class="device-list-item">
-  <div class="device-info-main" on:click={() => onView(device)}>
-    <div class="device-icon-wrapper">
-      <span class="device-icon">{getDeviceIcon()}</span>
+<div class="flex items-center justify-between w-full">
+  <div class="flex items-center gap-4 flex-1 min-w-0">
+    <div class="w-12 h-12 rounded-xl bg-gray-50 dark-bg-gray-900 flex items-center justify-center text-2xl group-hover:bg-indigo-50 dark:group-hover-bg-indigo-900-20 transition-colors">
+      {getDeviceIcon()}
     </div>
     
-    <div class="device-details">
-      <div class="device-name-row">
-        <h3 class="device-name">{device.brand} {device.model}</h3>
-        <span class="status-badge badge {statusColors[device.status]}">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-3 mb-1">
+        <h3 class="text-sm font-black text-gray-900 dark-text-white truncate group-hover:text-indigo-600 transition-colors">
+          {device.brand} {device.model}
+        </h3>
+        <span class="badge {statusColors[device.status]} border-none font-black text-[9px] px-2 py-1 rounded-md">
           {statusLabels[device.status]}
         </span>
       </div>
       
-      <div class="device-meta">
-        <span class="meta-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          {customerName}
+      <div class="flex items-center gap-3 text-[11px] font-medium text-gray-500">
+        <span class="flex items-center gap-1 uppercase tracking-wider">
+          <span class="opacity-40">👤</span> {customerName}
         </span>
-        
-        {#if device.color}
-          <span class="meta-item">• {device.color}</span>
-        {/if}
-        
-        {#if device.storage}
-          <span class="meta-item">• {device.storage}</span>
-        {/if}
+        {#if device.color}<span class="opacity-30">•</span> <span>{device.color}</span>{/if}
+        {#if device.storage}<span class="opacity-30">•</span> <span>{device.storage}</span>{/if}
       </div>
     </div>
   </div>
 
-  <div class="device-actions">
+  <div class="flex items-center gap-1 ml-4 border-l border-gray-50 dark-border-gray-700 pl-4 h-10">
     <button
-      class="action-btn"
-      on:click={() => onView(device)}
+      class="btn btn-ghost btn-xs w-8 h-8 rounded-lg hover:text-indigo-600 transition-colors"
+      on:click|stopPropagation={() => onView(device)}
       title="Ver detalles"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
         <circle cx="12" cy="12" r="3"/>
       </svg>
     </button>
     
     <button
-      class="action-btn"
-      on:click={() => onEdit(device)}
+      class="btn btn-ghost btn-xs w-8 h-8 rounded-lg hover:text-blue-600 transition-colors"
+      on:click|stopPropagation={() => onEdit(device)}
       title="Editar"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4">
         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
       </svg>
     </button>
     
     <button
-      class="action-btn"
-      on:click={() => onStatusChange(device)}
+      class="btn btn-ghost btn-xs w-8 h-8 rounded-lg hover:text-amber-600 transition-colors"
+      on:click|stopPropagation={() => onStatusChange(device)}
       title="Cambiar estado"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4">
         <polyline points="23 4 23 10 17 10"/>
         <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-      </svg>
-    </button>
-    
-    <button class="chevron-btn" title="Expandir">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="9 18 15 12 9 6"/>
       </svg>
     </button>
   </div>
 </div>
 
 <style>
-  .device-list-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: white;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    transition: all 0.2s;
-    margin-bottom: 0.5rem;
-  }
-
-  .device-list-item:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateX(2px);
-  }
-
-  .device-info-main {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex: 1;
-    cursor: pointer;
-    min-width: 0;
-  }
-
-  .device-icon-wrapper {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius);
-    background: linear-gradient(135deg, var(--light) 0%, #e0e7ff 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .device-icon {
-    font-size: 1.75rem;
-  }
-
-  .device-details {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .device-name-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .device-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--dark);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .status-badge {
-    font-size: 0.65rem;
-    padding: 0.2rem 0.5rem;
-    flex-shrink: 0;
-  }
-
-  .device-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8125rem;
-    color: var(--text-light);
-    flex-wrap: wrap;
-  }
-
-  .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .meta-item svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .device-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    margin-left: 0.5rem;
-  }
-
-  .action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: var(--text-light);
-    border-radius: var(--radius-sm);
-  }
-
-  .action-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .action-btn:hover {
-    background: var(--light);
-    color: var(--primary);
-  }
-
-  .chevron-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    color: var(--text-light);
-    margin-left: 0.5rem;
-  }
-
-  .chevron-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .chevron-btn:hover {
-    color: var(--text);
-  }
-
-  @media (max-width: 640px) {
-    .device-list-item {
-      padding: 0.75rem;
-    }
-
-    .device-info-main {
-      gap: 0.75rem;
-    }
-
-    .device-icon-wrapper {
-      width: 40px;
-      height: 40px;
-    }
-
-    .device-icon {
-      font-size: 1.5rem;
-    }
-
-    .device-name {
-      font-size: 0.9375rem;
-    }
-
-    .device-meta {
-      font-size: 0.75rem;
-    }
-
-    .action-btn {
-      width: 32px;
-      height: 32px;
-    }
-
-    .action-btn svg {
-      width: 16px;
-      height: 16px;
-    }
-  }
+  /* Todos los estilos ahora están en Tailwind v4 o DaisyUI */
+  :global(.dark) .dark-group-hover-bg-indigo-900-20:hover { background-color: rgba(49, 46, 129, 0.2); }
 </style>

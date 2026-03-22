@@ -553,16 +553,4 @@ def reject_repair_via_portal(
     return repair
 
 
-@router.get("/partner/my-devices", response_model=List[RepairResponse])
-def get_partner_repairs(
-    current_user: User = Depends(require_role(UserRole.PARTNER)),
-    session: Session = Depends(get_session)
-):
-    """Listar reparaciones vinculadas al socio comercial autenticado"""
-    repairs = session.exec(
-        select(Repair)
-        .where(Repair.partner_id == current_user.id)
-        .order_by(Repair.created_at.desc())
-    ).all()
-    return repairs
 

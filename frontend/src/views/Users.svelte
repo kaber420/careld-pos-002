@@ -199,23 +199,23 @@
 
     {#if showForm}
       <div 
-        class="modal-overlay" 
+        class="custom-modal-overlay" 
         on:click|self={closeForm} 
         on:keydown={(e) => e.key === 'Escape' && closeForm()}
         role="button"
         tabindex="0"
         aria-label="Cerrar modal"
       >
-        <div class="modal">
-          <div class="modal-header">
-            <h3 class="modal-title">
+        <div class="custom-modal">
+          <div class="custom-modal-header">
+            <h3 class="custom-modal-title">
               {editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
             </h3>
-            <button class="modal-close" on:click={closeForm}>×</button>
+            <button class="custom-modal-close" on:click={closeForm}>×</button>
           </div>
 
           <form on:submit|preventDefault={handleSubmit}>
-            <div class="modal-body">
+            <div class="custom-modal-body">
               <div class="form-row">
                 <div class="form-group">
                   <label class="label" for="username">Usuario *</label>
@@ -297,7 +297,7 @@
               {/if}
             </div>
 
-            <div class="modal-footer">
+            <div class="custom-modal-footer">
               <button type="button" class="btn btn-outline" on:click={closeForm}>
                 Cancelar
               </button>

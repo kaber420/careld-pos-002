@@ -125,20 +125,23 @@
   }
 </script>
 
-<div class="pos-cart">
-  <div class="cart-header">
-    <h3>Carrito de Cobro</h3>
+<div class="flex flex-col h-full overflow-hidden">
+  <div class="p-8 border-b border-gray-100 dark-border-gray-700 bg-gray-50/50">
+    <h3 class="text-2xl font-black text-gray-900 dark-text-white tracking-tight flex items-center gap-3">
+      <span class="text-3xl">🛒</span> Carrito
+    </h3>
   </div>
 
-  <div class="cart-search">
-    <div class="search-input-wrapper">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
+  <div class="p-6 border-b border-gray-100 dark-border-gray-700 bg-white/50 relative z-20">
+    <div class="relative group">
+      <span class="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-opacity" aria-hidden="true">🔍</span>
+      <label for="cart-product-search" class="sr-only">Buscar productos</label>
       <input 
+        id="cart-product-search"
+        name="cart-product-search"
         type="text" 
-        class="input" 
-        placeholder="Buscar accesorios o refacciones..." 
+        class="input w-full pl-12 h-14 rounded-2xl bg-gray-50 border-transparent focus:border-indigo-500 transition-all shadow-inner" 
+        placeholder="Buscar productos..." 
         value={searchQuery}
         on:input={handleSearch}
       />
@@ -146,326 +149,123 @@
 
     <!-- Search Results Dropdown -->
     {#if searchResults.length > 0 && searchQuery.length >= 2}
-      <div class="search-results">
+      <div class="absolute top-full left-6 right-6 bg-white dark-bg-gray-800 border border-gray-100 dark-border-gray-700 rounded-3xl shadow-2xl max-h-[400px] overflow-y-auto mt-4 py-3 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+        <div class="px-6 py-2 border-b border-gray-50 dark-border-gray-700">
+          <span class="text-[10px] font-black uppercase text-indigo-400 tracking-widest">Resultados ({searchResults.length})</span>
+        </div>
         {#each searchResults as product}
-          <div class="search-result-item" on:click={() => addToCart(product)}>
-            <div class="product-info">
-              <span class="product-name">{product.name}</span>
-              <span class="product-stock text-sm text-muted">Stock: {product.stock_quantity}</span>
+          <div 
+            class="flex justify-between items-center p-5 hover:bg-indigo-50 dark:hover-bg-indigo-900-30 cursor-pointer transition-colors group" 
+            on:click={() => addToCart(product)}
+            on:keydown={(e) => e.key === 'Enter' && addToCart(product)}
+            role="button"
+            tabindex="0"
+          >
+            <div class="flex flex-col flex-1">
+              <span class="font-bold text-gray-900 dark-text-white group-hover:text-indigo-600 transition-colors">{product.name}</span>
+              <div class="flex items-center gap-3 mt-1.5">
+                <span class="text-[10px] font-black px-2 py-0.5 bg-gray-100 dark-bg-gray-700 rounded-lg text-gray-500">STOCK: {product.stock_quantity}</span>
+                <span class="text-xs font-black text-indigo-600">${product.unit_price}</span>
+              </div>
             </div>
-            <span class="product-price">${product.unit_price}</span>
+            <button class="btn btn-primary btn-sm btn-square rounded-xl opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
+              ➕
+            </button>
           </div>
         {/each}
       </div>
     {/if}
   </div>
 
-  <div class="cart-items">
+  <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/30">
     {#if cartItems.length === 0}
-      <div class="empty-cart">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <div class="flex flex-col items-center justify-center h-full opacity-10 text-center py-20">
+        <svg class="w-24 h-24 mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
           <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
         </svg>
-        <p>El carrito está vacío</p>
+        <p class="text-xl font-black uppercase tracking-tighter">Sin artículos</p>
       </div>
     {:else}
       {#each cartItems as item, idx}
-        <div class="cart-item">
-          <div class="item-details">
-            <span class="item-name">{item.name}</span>
-            <span class="item-price">${item.price.toFixed(2)}</span>
+        <div class="bg-white/80 dark-bg-gray-800 p-5 rounded-3xl border border-gray-100 dark-border-gray-700 shadow-sm flex justify-between items-center group hover:border-indigo-400 transition-all scale-in">
+          <div class="flex flex-col flex-1">
+            <span class="font-bold text-gray-900 dark-text-white line-clamp-1 leading-tight">{item.name}</span>
+            <span class="text-sm text-gray-400 font-black mt-1">${item.price.toFixed(2)}</span>
           </div>
-          <div class="item-actions">
-            {#if item.type === 'product'}
-              <div class="quantity-controls">
-                <button class="btn btn-sm btn-outline" on:click={() => updateQuantity(idx, -1)}>-</button>
-                <span class="quantity">{item.quantity}</span>
-                <button class="btn btn-sm btn-outline" on:click={() => updateQuantity(idx, 1)}>+</button>
+          <div class="flex items-center gap-4 ml-4">
+            {#if item.type === 'product' || item.type === 'extra'}
+              <div class="flex items-center bg-gray-100/50 p-1.5 rounded-2xl">
+                <button class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-xl transition-all font-black" on:click={() => updateQuantity(idx, -1)}>-</button>
+                <span class="w-10 text-center font-black text-sm">{item.quantity}</span>
+                <button class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-xl transition-all font-black" on:click={() => updateQuantity(idx, 1)}>+</button>
               </div>
             {:else}
-              <span class="item-badge">Servicio</span>
+              <span class="text-[10px] font-black px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full uppercase tracking-widest">Servicio</span>
             {/if}
-            <button class="btn btn-sm btn-icon-secondary remove-btn" on:click={() => removeItem(idx)}>×</button>
+            <button class="text-gray-300 hover:text-red-500 transition-colors p-2" on:click={() => removeItem(idx)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-5 h-5">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </div>
         </div>
       {/each}
     {/if}
   </div>
 
-  <div class="cart-footer">
-    <div class="summary-row total-row">
-      <span>Total a Pagar</span>
-      <span>${total.toFixed(2)}</span>
+  <div class="p-8 bg-white/60 border-t border-gray-100">
+    <div class="flex justify-between items-end mb-10">
+      <div>
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Total del Pago</p>
+        <p class="text-5xl font-black text-gray-900 tracking-tighter">${total.toFixed(2)}</p>
+      </div>
     </div>
 
-    <div class="payment-section">
-      <div class="form-group">
-        <label>Método de Pago</label>
-        <select class="input" bind:value={paymentMethod}>
-          <option value="cash">Efectivo</option>
-          <option value="credit_card">Tarjeta Crédito/Débito</option>
-          <option value="transfer">Transferencia</option>
+    <div class="space-y-6 mb-10">
+      <div class="form-control">
+        <label for="payment-method" class="label"><span class="label-text font-black text-[10px] text-gray-400 uppercase tracking-widest">Método de Pago</span></label>
+        <select id="payment-method" class="select select-bordered w-full rounded-2xl h-14 bg-white border-gray-100 font-bold" bind:value={paymentMethod}>
+          <option value="cash">💵 Efectivo</option>
+          <option value="credit_card">💳 Tarjeta</option>
+          <option value="transfer">🏦 Transferencia</option>
         </select>
       </div>
 
       {#if paymentMethod === 'cash'}
-        <div class="form-group">
-          <label>Monto Recibido</label>
-          <div class="input-with-prefix">
-            <span class="prefix">$</span>
-            <input type="number" class="input" bind:value={amountPaid} min={total} step="0.01">
+        <div class="form-control">
+          <label for="amount-paid" class="label"><span class="label-text font-black text-[10px] text-gray-400 uppercase tracking-widest">Monto Recibido</span></label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-gray-400">$</span>
+            <input id="amount-paid" name="amount-paid" type="number" class="input input-bordered w-full pl-8 h-14 rounded-2xl bg-white border-gray-100 font-black text-xl" bind:value={amountPaid} min={total} step="0.01">
           </div>
         </div>
         {#if change > 0}
-          <div class="summary-row text-success">
-            <span>Cambio a devolver</span>
-            <span>${change.toFixed(2)}</span>
+          <div class="flex justify-between items-center p-5 bg-green-50 rounded-3xl border border-green-100 border-dashed">
+            <span class="text-green-700 font-black uppercase text-[10px] tracking-widest">Cambio</span>
+            <span class="text-green-700 font-black text-2xl">${change.toFixed(2)}</span>
           </div>
         {/if}
       {/if}
     </div>
 
     <button 
-      class="btn btn-primary btn-block checkout-btn" 
+      class="btn-premium w-full h-18 text-xl" 
       disabled={cartItems.length === 0 || (paymentMethod === 'cash' && amountPaid < total)}
       on:click={handleCheckout}
     >
-      Cobrar ${total.toFixed(2)}
+      FINALIZAR COBRO
     </button>
   </div>
 </div>
 
 <style>
-  .pos-cart {
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    max-height: calc(100vh - 100px);
-    overflow: hidden;
+  /* Todos los estilos ahora están en Tailwind v4 o clases personalizadas en app.css */
+  .scale-in {
+    animation: scaleIn 0.3s ease-out;
   }
-
-  .cart-header {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .cart-header h3 {
-    margin: 0;
-    font-size: 1.25rem;
-  }
-
-  .cart-search {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    z-index: 10;
-  }
-
-  .search-input-wrapper {
-    position: relative;
-  }
-
-  .search-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    color: var(--text-light);
-  }
-
-  .search-input-wrapper .input {
-    padding-left: 36px;
-    width: 100%;
-  }
-
-  .search-results {
-    position: absolute;
-    top: 100%;
-    left: 1rem;
-    right: 1rem;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    max-height: 250px;
-    overflow-y: auto;
-    margin-top: 4px;
-  }
-
-  .search-result-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border-light);
-  }
-
-  .search-result-item:hover {
-    background: var(--bg-hover);
-  }
-
-  .product-info {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .product-name {
-    font-weight: 500;
-  }
-
-  .product-price {
-    font-weight: 600;
-    color: var(--primary);
-  }
-
-  .cart-items {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    background: var(--bg-body);
-  }
-
-  .empty-cart {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--text-light);
-    opacity: 0.7;
-  }
-
-  .empty-cart svg {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 1rem;
-  }
-
-  .cart-item {
-    background: white;
-    border-radius: var(--radius-md);
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .item-details {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
-  .item-name {
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-  }
-
-  .item-price {
-    font-size: 0.875rem;
-    color: var(--text-light);
-  }
-
-  .item-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--bg-body);
-    border-radius: var(--radius-sm);
-    padding: 2px;
-  }
-
-  .quantity-controls .btn {
-    padding: 2px 8px;
-    min-width: 28px;
-  }
-
-  .quantity {
-    font-weight: 600;
-    min-width: 20px;
-    text-align: center;
-  }
-
-  .item-badge {
-    background: var(--info-light);
-    color: var(--info);
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .remove-btn {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .cart-footer {
-    padding: 1rem;
-    border-top: 1px solid var(--border);
-    background: white;
-    border-bottom-left-radius: var(--radius-lg);
-    border-bottom-right-radius: var(--radius-lg);
-  }
-
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-  }
-
-  .total-row {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1.25rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px dashed var(--border);
-  }
-
-  .payment-section {
-    margin-bottom: 1.5rem;
-  }
-
-  .input-with-prefix {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .input-with-prefix .prefix {
-    position: absolute;
-    left: 12px;
-    color: var(--text-light);
-    font-weight: 600;
-  }
-
-  .input-with-prefix .input {
-    padding-left: 28px;
-  }
-
-  .checkout-btn {
-    height: 3rem;
-    font-size: 1.125rem;
-    font-weight: 600;
+  @keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
   }
 </style>

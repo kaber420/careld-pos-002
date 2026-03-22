@@ -277,13 +277,13 @@
 
   <!-- Modal Form -->
   {#if showForm}
-    <div class="modal-overlay" on:click|self={closeForm}>
-      <div class="modal modal-lg">
-        <div class="modal-header">
-          <h3 class="modal-title">
+    <div class="custom-modal-overlay" on:click|self={closeForm}>
+      <div class="custom-modal modal-lg">
+        <div class="custom-modal-header">
+          <h3 class="custom-modal-title">
             {editingDevice ? 'Editar Dispositivo' : 'Nuevo Dispositivo'}
           </h3>
-          <button class="modal-close" on:click={closeForm}>×</button>
+          <button class="custom-modal-close" on:click={closeForm}>×</button>
         </div>
 
         <DeviceForm

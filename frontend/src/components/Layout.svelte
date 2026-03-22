@@ -1,4 +1,5 @@
 <script>
+  export let title = "";
   import { navigate } from 'svelte-routing';
   import { user, clearAuth, notify, notifications, removeNotification } from '../stores/auth';
 

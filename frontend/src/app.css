@@ -663,8 +663,8 @@ svg.h-6, svg.w-6 { width: 1.5rem !important; height: 1.5rem !important; min-widt
   border: 1px solid #fecaca;
 }
 
-/* Modal */
-.modal-overlay {
+/* Custom Modal System (Avoiding conflict with DaisyUI) */
+.custom-modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
@@ -675,7 +675,7 @@ svg.h-6, svg.w-6 { width: 1.5rem !important; height: 1.5rem !important; min-widt
   padding: 1rem;
 }
 
-.modal {
+.custom-modal {
   background: white;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
@@ -685,7 +685,7 @@ svg.h-6, svg.w-6 { width: 1.5rem !important; height: 1.5rem !important; min-widt
   overflow: auto;
 }
 
-.modal-header {
+.custom-modal-header {
   padding: 1.25rem;
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -693,12 +693,12 @@ svg.h-6, svg.w-6 { width: 1.5rem !important; height: 1.5rem !important; min-widt
   align-items: center;
 }
 
-.modal-title {
+.custom-modal-title {
   font-size: 1.125rem;
   font-weight: 600;
 }
 
-.modal-close {
+.custom-modal-close {
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -708,15 +708,15 @@ svg.h-6, svg.w-6 { width: 1.5rem !important; height: 1.5rem !important; min-widt
   line-height: 1;
 }
 
-.modal-close:hover {
+.custom-modal-close:hover {
   color: var(--text);
 }
 
-.modal-body {
+.custom-modal-body {
   padding: 1.25rem;
 }
 
-.modal-footer {
+.custom-modal-footer {
   padding: 1.25rem;
   border-top: 1px solid var(--border);
   display: flex;

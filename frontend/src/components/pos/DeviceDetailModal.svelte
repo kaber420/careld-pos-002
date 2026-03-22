@@ -55,22 +55,26 @@
 </script>
 
 {#if show && device}
-  <div class="modal-overlay" on:click|self={onClose}>
-    <div class="modal modal-xl device-detail-modal">
-      <div class="modal-header">
+<div 
+  class="custom-modal-overlay" 
+  on:click|self={onClose}
+  style="position: fixed !important; inset: 0 !important; background: rgba(0,0,0,0.7) !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; pointer-events: auto !important;"
+>
+    <div class="custom-modal modal-xl device-detail-modal">
+      <div class="custom-modal-header">
         <div class="header-left">
           <span class="device-icon-large">{getDeviceIcon()}</span>
           <div>
-            <h3 class="modal-title">{device.brand} {device.model}</h3>
+            <h3 class="custom-modal-title">{device.brand} {device.model}</h3>
             <span class="badge {statusColors[device.status]}">
               {statusLabels[device.status]}
             </span>
           </div>
         </div>
-        <button class="modal-close" on:click={onClose}>×</button>
+        <button class="custom-modal-close" on:click={onClose}>×</button>
       </div>
 
-      <div class="modal-body">
+      <div class="custom-modal-body">
         <div class="detail-grid">
           <!-- Información del cliente -->
           <div class="detail-card">
@@ -209,7 +213,7 @@
         {/if}
       </div>
 
-      <div class="modal-footer">
+      <div class="custom-modal-footer">
         <button type="button" class="btn btn-outline" on:click={onClose}>
           Cerrar
         </button>
@@ -233,7 +237,7 @@
 {/if}
 
 <style>
-  .device-detail-modal .modal-body {
+  .device-detail-modal .custom-modal-body {
     max-height: 65vh;
     overflow-y: auto;
   }
@@ -248,7 +252,7 @@
     font-size: 3rem;
   }
 
-  .modal-title {
+  .custom-modal-title {
     margin-bottom: 0.5rem;
   }
 

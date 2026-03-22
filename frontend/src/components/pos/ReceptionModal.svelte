@@ -22,7 +22,6 @@
     priority: 'normal'
   };
   export let photos = [];
-  export let isProcessing = false;
   export let onClose = () => {};
   export let onSuccess = () => {};
   export let onPrintTicket = () => {};
@@ -73,15 +72,20 @@
     onClose();
   }
 </script>
-
-{#if show}
-<div class="modal-overlay" on:click|self={handleClose}>
-  <div class="modal modal-xl">
-    <div class="modal-header">
-      <div><h3 class="modal-title">Nueva Recepción</h3><p class="modal-subtitle">Registro de dispositivo y reparación</p></div>
-      <button class="modal-close" on:click={handleClose}>×</button>
+<div 
+  class="custom-modal-overlay" 
+  on:click|self={handleClose}
+  role="button"
+  tabindex="0"
+  on:keydown={(e) => e.key === 'Escape' && handleClose()}
+  style="position: fixed !important; inset: 0 !important; background: rgba(0,0,0,0.7) !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; pointer-events: auto !important;"
+>
+  <div class="custom-modal modal-xl">
+    <div class="custom-modal-header">
+      <div><h3 class="custom-modal-title">Nueva Recepción</h3><p class="modal-subtitle">Registro de dispositivo y reparación</p></div>
+      <button class="custom-modal-close" type="button" on:click={handleClose}>×</button>
     </div>
-    <div class="modal-body">
+    <div class="custom-modal-body">
       <DeviceForm
         {customers}
         bind:selectedCustomer
@@ -89,7 +93,6 @@
         bind:customerForm
         bind:deviceForm
         bind:photos
-        {isProcessing}
         showPhotos={true}
         showDescription={true}
         submitLabel="Recibir Dispositivo"
@@ -99,11 +102,11 @@
     </div>
   </div>
 </div>
-{/if}
 
 <style>
-  .modal-xl { max-width: 900px; }
-  .modal-header { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem; }
-  .modal-title { margin: 0; }
+  .custom-modal-overlay { z-index: 10000 !important; cursor: pointer; display: flex !important; }
+  .modal-xl { max-width: 900px; width: 95%; }
+  .custom-modal-header { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem; }
+  .custom-modal-title { margin: 0; }
   .modal-subtitle { font-size: 0.875rem; color: var(--text-light); margin: 0.25rem 0 0; }
 </style>

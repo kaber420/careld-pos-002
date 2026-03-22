@@ -59,11 +59,11 @@
 </script>
 
 {#if show && ticketData}
-<div class="modal-overlay" on:click|self={onClose}>
-  <div class="modal modal-md">
-    <div class="modal-header">
+<div class="custom-modal-overlay" on:click|self={onClose}>
+  <div class="custom-modal modal-md">
+    <div class="custom-modal-header">
       <div>
-        <h3 class="modal-title">Impresión de Ticket</h3>
+        <h3 class="custom-modal-title">Impresión de Ticket</h3>
         <div style="display: flex; gap: 1rem; align-items: center; margin-top: 0.25rem;">
            <p class="modal-subtitle" style="margin: 0;">Vista previa</p>
            <select class="select select-sm" bind:value={paperWidth} style="padding: 2px 8px; font-size: 0.75rem;">
@@ -72,10 +72,10 @@
            </select>
         </div>
       </div>
-      <button class="modal-close" on:click={onClose}>×</button>
+      <button class="custom-modal-close" on:click={onClose}>×</button>
     </div>
     
-    <div class="modal-body {printClass} {paperWidth === '58mm' ? 'w-58mm' : 'w-80mm'}" style="background: var(--light); padding: 2rem; max-height: 70vh; overflow-y: auto;">
+    <div class="custom-modal-body {printClass} {paperWidth === '58mm' ? 'w-58mm' : 'w-80mm'}" style="background: var(--light); padding: 2rem; max-height: 70vh; overflow-y: auto;">
       <div id="ticket-content" class="ticket">
         {#if ticketData.type === 'recepcion' || ticketData.type === 'etiqueta_full'}
           <!-- TICKET DE RECEPCION -->
@@ -186,7 +186,7 @@
       </div>
     </div>
 
-    <div class="modal-footer" style="justify-content: space-between;">
+    <div class="custom-modal-footer" style="justify-content: space-between;">
       <button class="btn btn-outline" on:click={onClose}>Cerrar</button>
       <div style="display: flex; gap: 0.5rem;">
         {#if ticketData.type === 'recepcion' || ticketData.type === 'etiqueta_full'}
@@ -370,11 +370,11 @@
     }
     
     /* Aislamiento total del ERP */
-    :global(body > *:not(.modal-overlay)) {
+    :global(body > *:not(.custom-modal-overlay)) {
       display: none !important;
     }
     
-    :global(.modal-overlay) {
+    :global(.custom-modal-overlay) {
       background: white !important;
       position: absolute !important;
       top: 0 !important;
@@ -386,11 +386,11 @@
       margin: 0 !important;
     }
     
-    :global(.modal-overlay > *:not(.modal)) {
+    :global(.custom-modal-overlay > *:not(.custom-modal)) {
       display: none !important;
     }
 
-    .modal {
+    .custom-modal {
       border: none !important;
       box-shadow: none !important;
       width: 100% !important;
@@ -400,7 +400,7 @@
       background: white !important;
     }
     
-    .modal-header, .modal-footer, .modal-close {
+    .custom-modal-header, .custom-modal-footer, .custom-modal-close {
       display: none !important;
     }
 
@@ -427,7 +427,7 @@
     .print-sale-only #printable-label { display: none !important; }
 
     /* Forzar visibilidad si el printClass está vacío (Imprimir Todo) */
-    .modal-body:not(.print-receipt-only):not(.print-label-only):not(.print-sale-only) .ticket-page {
+    .custom-modal-body:not(.print-receipt-only):not(.print-label-only):not(.print-sale-only) .ticket-page {
        display: block !important;
     }
   }

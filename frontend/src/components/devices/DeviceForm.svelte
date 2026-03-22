@@ -60,7 +60,7 @@
   // Sincronizar selectedCustomer cuando selectedCustomerId cambia
   $: {
     if (selectedCustomerId && !showCustomerForm) {
-      selectedCustomer = customers.find(c => c.id === selectedCustomerId) || null;
+      selectedCustomer = (customers || []).find(c => c.id === selectedCustomerId) || null;
     }
   }
 
@@ -327,7 +327,7 @@
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
-  <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
+  <div class="custom-modal-body" style="max-height: 65vh; overflow-y: auto;">
     {#if showPhotos}
     <!-- Fotos del dispositivo -->
     <div class="form-section">
@@ -354,13 +354,15 @@
           </svg>
           Grabar Video
         </button>
-        <label class="btn btn-outline btn-sm" style="cursor: pointer;">
+        <label class="btn btn-outline btn-sm" style="cursor: pointer;" for="device-file-upload">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="17 8 12 3 7 8"/>
           </svg>
           Subir Archivos
           <input
+            id="device-file-upload"
+            name="device-file-upload"
             type="file"
             accept="image/*,video/*"
             multiple
@@ -372,10 +374,12 @@
 
       {#if photos.length > 0}
       <div class="photos-grid">
-        {#each photos as photo, index}
+        {#each photos || [] as photo, index}
         <div class="photo-item">
           {#if photo.endsWith('.mp4') || photo.endsWith('.mov') || photo.includes('video')}
-          <video src={photo} controls></video>
+          <video src={photo} controls>
+            <track kind="captions" />
+          </video>
           {:else}
           <img src={photo} alt="Foto del dispositivo" />
           {/if}
@@ -407,28 +411,28 @@
       {#if showCustomerForm}
         <div class="form-grid">
           <div class="form-group">
-            <label class="label">Nombre *</label>
-            <input type="text" class="input" bind:value={customerForm.name} required={showCustomerForm} placeholder="Nombre completo" />
+            <label class="label" for="cust_name">Nombre *</label>
+            <input id="cust_name" name="name" type="text" class="input" bind:value={customerForm.name} required={showCustomerForm} placeholder="Nombre completo" />
           </div>
           <div class="form-group">
-            <label class="label">Teléfono *</label>
-            <input type="tel" class="input" bind:value={customerForm.phone} required={showCustomerForm} placeholder="Ej: 555-0123" />
+            <label class="label" for="cust_phone">Teléfono *</label>
+            <input id="cust_phone" name="phone" type="tel" class="input" bind:value={customerForm.phone} required={showCustomerForm} placeholder="Ej: 555-0123" />
           </div>
           <div class="form-group">
-            <label class="label">Email</label>
-            <input type="email" class="input" bind:value={customerForm.email} placeholder="correo@ejemplo.com" />
+            <label class="label" for="cust_email">Email</label>
+            <input id="cust_email" name="email" type="email" class="input" bind:value={customerForm.email} placeholder="correo@ejemplo.com" />
           </div>
           <div class="form-group">
-            <label class="label">WhatsApp</label>
-            <input type="tel" class="input" bind:value={customerForm.whatsapp} placeholder="Ej: +52 55..." />
+            <label class="label" for="cust_wa">WhatsApp</label>
+            <input id="cust_wa" name="whatsapp" type="tel" class="input" bind:value={customerForm.whatsapp} placeholder="Ej: +52 55..." />
           </div>
           <div class="form-group full-width">
-            <label class="label">Telegram</label>
-            <input type="text" class="input" bind:value={customerForm.telegram} placeholder="@usuario" />
+            <label class="label" for="cust_tg">Telegram</label>
+            <input id="cust_tg" name="telegram" type="text" class="input" bind:value={customerForm.telegram} placeholder="@usuario" />
           </div>
           <div class="form-group full-width">
-            <label class="label">Dirección</label>
-            <input type="text" class="input" bind:value={customerForm.address} placeholder="Dirección completa" />
+            <label class="label" for="cust_addr">Dirección</label>
+            <input id="cust_addr" name="address" type="text" class="input" bind:value={customerForm.address} placeholder="Dirección completa" />
           </div>
         </div>
       {:else}
@@ -436,7 +440,7 @@
           <label class="label" for="customer_id">Buscar Cliente *</label>
           <select id="customer_id" class="select" bind:value={selectedCustomerId} required={!showCustomerForm}>
             <option value="">Seleccionar cliente</option>
-            {#each customers as customer}
+            {#each customers || [] as customer}
               <option value={customer.id}>{customer.name} - {customer.phone}</option>
             {/each}
           </select>
@@ -456,8 +460,8 @@
 
       <div class="form-grid">
         <div class="form-group">
-          <label class="label">Tipo de Dispositivo *</label>
-          <select class="select" bind:value={deviceForm.device_type}>
+          <label class="label" for="dev_type">Tipo de Dispositivo *</label>
+          <select id="dev_type" name="device_type" class="select" bind:value={deviceForm.device_type}>
             {#each deviceTypes as type}
               <option value={type.value}>{type.label}</option>
             {/each}
@@ -465,51 +469,51 @@
         </div>
 
         <div class="form-group">
-          <label class="label">Marca *</label>
-          <input type="text" class="input" bind:value={deviceForm.brand} required placeholder="Ej: Samsung, Apple..." />
+          <label class="label" for="dev_brand">Marca *</label>
+          <input id="dev_brand" name="brand" type="text" class="input" bind:value={deviceForm.brand} required placeholder="Ej: Samsung, Apple..." />
         </div>
 
         <div class="form-group">
-          <label class="label">Modelo</label>
-          <input type="text" class="input" bind:value={deviceForm.model} placeholder="Ej: Galaxy S21" />
+          <label class="label" for="dev_model">Modelo</label>
+          <input id="dev_model" name="model" type="text" class="input" bind:value={deviceForm.model} placeholder="Ej: Galaxy S21" />
         </div>
 
         <div class="form-group">
-          <label class="label">Nº de Serie / IMEI</label>
-          <input type="text" class="input" bind:value={deviceForm.serial_number} placeholder="Opcional" />
+          <label class="label" for="dev_serial">Nº de Serie / IMEI</label>
+          <input id="dev_serial" name="serial_number" type="text" class="input" bind:value={deviceForm.serial_number} placeholder="Opcional" />
         </div>
 
         <div class="form-group">
-          <label class="label">Color</label>
-          <input type="text" class="input" bind:value={deviceForm.color} placeholder="Ej: Negro" />
+          <label class="label" for="dev_color">Color</label>
+          <input id="dev_color" name="color" type="text" class="input" bind:value={deviceForm.color} placeholder="Ej: Negro" />
         </div>
 
         <div class="form-group">
-          <label class="label">Almacenamiento</label>
-          <input type="text" class="input" bind:value={deviceForm.storage} placeholder="Ej: 128GB" />
+          <label class="label" for="dev_storage">Almacenamiento</label>
+          <input id="dev_storage" name="storage" type="text" class="input" bind:value={deviceForm.storage} placeholder="Ej: 128GB" />
         </div>
 
         <div class="form-group">
-          <label class="label">Patrón/Contraseña</label>
-          <input type="text" class="input" bind:value={deviceForm.password_pattern} placeholder="PIN, patrón..." />
+          <label class="label" for="dev_pass">Patrón/Contraseña</label>
+          <input id="dev_pass" name="password_pattern" type="text" class="input" bind:value={deviceForm.password_pattern} placeholder="PIN, patrón..." />
         </div>
 
         <div class="form-group">
-          <label class="label">Accesorios</label>
-          <input type="text" class="input" bind:value={deviceForm.accessories} placeholder="Cargador, funda..." />
+          <label class="label" for="dev_acc">Accesorios</label>
+          <input id="dev_acc" name="accessories" type="text" class="input" bind:value={deviceForm.accessories} placeholder="Cargador, funda..." />
         </div>
       </div>
 
       {#if showDescription}
       <div class="form-group full-width">
-        <label class="label">Descripción del problema / Trabajo a realizar *</label>
-        <textarea class="textarea" bind:value={deviceForm.description} placeholder="Describa el problema..." rows="3"></textarea>
+        <label class="label" for="dev_desc">Descripción del problema / Trabajo a realizar *</label>
+        <textarea id="dev_desc" name="description" class="textarea" bind:value={deviceForm.description} placeholder="Describa el problema..." rows="3"></textarea>
       </div>
       {/if}
     </div>
   </div>
 
-  <div class="modal-footer">
+  <div class="custom-modal-footer">
     {#if onClose}
     <button type="button" class="btn btn-outline" on:click={onClose}>Cancelar</button>
     {/if}
@@ -521,14 +525,16 @@
 
 <!-- Modal Cámara -->
 {#if showCamera}
-<div class="camera-overlay" on:click|self={closeCamera}>
+<div class="camera-overlay" on:click|self={closeCamera} on:keydown={(e) => e.key === 'Escape' && closeCamera()} role="button" tabindex="0">
   <div class="camera-modal">
     <div class="camera-header">
       <h3>{cameraMode === 'photo' ? 'Tomar Foto' : 'Grabar Video'}</h3>
       <button class="camera-close" type="button" on:click={closeCamera}>×</button>
     </div>
     <div class="camera-body">
-      <video bind:this={videoElement} autoplay playsinline></video>
+      <video bind:this={videoElement} autoplay playsinline>
+        <track kind="captions" />
+      </video>
       <div class="camera-controls">
         {#if cameraMode === 'photo'}
         <button class="btn btn-primary btn-lg" type="button" on:click={takePhoto}>
@@ -551,7 +557,7 @@
 {/if}
 
 <style>
-  .modal-body {
+  .custom-modal-body {
     padding: 0;
   }
 
@@ -678,7 +684,7 @@
     font-size: 0.8125rem;
   }
 
-  .modal-footer {
+  .custom-modal-footer {
     padding: 1.25rem;
     border-top: 1px solid var(--border);
     display: flex;

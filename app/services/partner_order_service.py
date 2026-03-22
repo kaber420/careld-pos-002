@@ -5,6 +5,7 @@ from app.models.partner_order import PartnerOrder, PartnerOrderItem, PartnerOrde
 from app.models.inventory import InventoryItem, MovementType
 from app.services.inventory_service import InventoryService
 from fastapi import HTTPException, status
+from sqlalchemy.orm import selectinload
 
 class PartnerOrderService:
     """Servicio de gestión de pedidos de socios"""
@@ -86,6 +87,10 @@ class PartnerOrderService:
         return self.session.exec(
             select(PartnerOrder)
             .where(PartnerOrder.partner_id == partner_id)
+            .options(
+                selectinload(PartnerOrder.items).selectinload(PartnerOrderItem.inventory_item),
+                selectinload(PartnerOrder.partner)
+            )
             .order_by(PartnerOrder.created_at.desc())
             .offset(skip)
             .limit(limit)
@@ -95,6 +100,10 @@ class PartnerOrderService:
         """Listar todos los pedidos (para admin/staff)"""
         return self.session.exec(
             select(PartnerOrder)
+            .options(
+                selectinload(PartnerOrder.items).selectinload(PartnerOrderItem.inventory_item),
+                selectinload(PartnerOrder.partner)
+            )
             .order_by(PartnerOrder.created_at.desc())
             .offset(skip)
             .limit(limit)

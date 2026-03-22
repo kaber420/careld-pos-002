@@ -1,5 +1,6 @@
 <script>
-  export let search = '';
+  export let value = '';
+  export let placeholder = 'Buscar por dispositivo, cliente, teléfono...';
   export let filters = {
     status: '',
     device_type: '',
@@ -50,7 +51,7 @@
   }
 
   function hasActiveFilters() {
-    return search || filters.status || filters.device_type || filters.brand;
+    return value || filters.status || filters.device_type || filters.brand;
   }
 </script>
 
@@ -60,14 +61,17 @@
       <circle cx="11" cy="11" r="8"/>
       <line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
+    <label for="pos-search" class="sr-only">Buscar dispositivos</label>
     <input
+      id="pos-search"
+      name="search"
       type="text"
       class="search-input"
-      placeholder="Buscar por dispositivo, cliente, teléfono..."
-      bind:value={search}
+      {placeholder}
+      bind:value
     />
-    {#if search}
-      <button class="clear-search" on:click={() => { search = ''; }}>
+    {#if value}
+      <button class="clear-search" on:click={() => { value = ''; }}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/>
           <line x1="6" y1="6" x2="18" y2="18"/>
@@ -93,8 +97,8 @@
     <div class="filters-panel">
       <div class="filters-grid">
         <div class="filter-group">
-          <label class="filter-label">Estado</label>
-          <select class="filter-select" bind:value={filters.status}>
+          <label for="filter-status" class="filter-label">Estado</label>
+          <select id="filter-status" class="filter-select" bind:value={filters.status}>
             {#each statusOptions as option}
               <option value={option.value}>{option.label}</option>
             {/each}
@@ -102,8 +106,8 @@
         </div>
 
         <div class="filter-group">
-          <label class="filter-label">Tipo de dispositivo</label>
-          <select class="filter-select" bind:value={filters.device_type}>
+          <label for="filter-type" class="filter-label">Tipo de dispositivo</label>
+          <select id="filter-type" class="filter-select" bind:value={filters.device_type}>
             {#each deviceTypeOptions as option}
               <option value={option.value}>{option.label}</option>
             {/each}
@@ -111,8 +115,8 @@
         </div>
 
         <div class="filter-group">
-          <label class="filter-label">Marca</label>
-          <select class="filter-select" bind:value={filters.brand}>
+          <label for="filter-brand" class="filter-label">Marca</label>
+          <select id="filter-brand" class="filter-select" bind:value={filters.brand}>
             {#each brandOptions as option}
               <option value={option.value}>{option.label}</option>
             {/each}

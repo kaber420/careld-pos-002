@@ -27,13 +27,13 @@
 </script>
 
 {#if show}
-  <div class="modal-overlay" on:click|self={onClose}>
-    <div class="modal status-modal">
-      <div class="modal-header">
-        <h3 class="modal-title">{title}</h3>
-        <button class="modal-close" on:click={onClose}>×</button>
+  <div class="custom-modal-overlay" on:click|self={onClose}>
+    <div class="custom-modal status-modal">
+      <div class="custom-modal-header">
+        <h3 class="custom-modal-title">{title}</h3>
+        <button class="custom-modal-close" on:click={onClose}>×</button>
       </div>
-      <div class="modal-body">
+      <div class="custom-modal-body">
         <div class="status-grid">
           {#each Object.entries(options) as [value, label]}
             <button 
@@ -49,7 +49,7 @@
           {/each}
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="custom-modal-footer">
         <button class="btn btn-outline btn-block" on:click={onClose}>Cancelar</button>
       </div>
     </div>

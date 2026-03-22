@@ -562,23 +562,23 @@
 
     {#if showForm}
       <div 
-        class="modal-overlay" 
+        class="custom-modal-overlay" 
         on:click|self={closeForm}
         on:keydown={(e) => e.key === 'Escape' && closeForm()}
         role="button"
         tabindex="0"
         aria-label="Cerrar modal"
       >
-        <div class="modal modal-lg">
-          <div class="modal-header">
-            <h3 class="modal-title">
+        <div class="custom-modal modal-lg">
+          <div class="custom-modal-header">
+            <h3 class="custom-modal-title">
               {editingRepair ? `Reparación ${editingRepair.repair_number}` : 'Nueva Reparación'}
             </h3>
-            <button class="modal-close" on:click={closeForm}>×</button>
+            <button class="custom-modal-close" on:click={closeForm}>×</button>
           </div>
 
           <form on:submit|preventDefault={handleSubmit}>
-            <div class="modal-body">
+            <div class="custom-modal-body">
               {#if editingRepair}
                 <div class="alert alert-info mb-4">
                   <strong>Número de orden:</strong> {editingRepair.repair_number}
@@ -748,7 +748,7 @@
               {/if}
             </div>
 
-            <div class="modal-footer">
+            <div class="custom-modal-footer">
               <button type="button" class="btn btn-outline" on:click={closeForm}>Cancelar</button>
               <button type="submit" class="btn btn-primary">
                 {editingRepair ? 'Actualizar' : 'Crear'} Reparación
@@ -761,20 +761,20 @@
 
     {#if showCompleteModal}
       <div 
-        class="modal-overlay" 
+        class="custom-modal-overlay" 
         on:click|self={() => showCompleteModal = false}
         on:keydown={(e) => e.key === 'Escape' && (showCompleteModal = false)}
         role="button"
         tabindex="0"
         aria-label="Cerrar modal"
       >
-        <div class="modal modal-lg">
-          <div class="modal-header">
-            <h3 class="modal-title">💰 Completar Reparación - {selectedRepair?.repair_number}</h3>
-            <button class="modal-close" on:click={() => showCompleteModal = false}>×</button>
+        <div class="custom-modal modal-lg">
+          <div class="custom-modal-header">
+            <h3 class="custom-modal-title">💰 Completar Reparación - {selectedRepair?.repair_number}</h3>
+            <button class="custom-modal-close" on:click={() => showCompleteModal = false}>×</button>
           </div>
           
-          <div class="modal-body">
+          <div class="custom-modal-body">
             <div class="summary-box mb-4">
               <h4>Resumen</h4>
               <div class="summary-row">
@@ -800,8 +800,8 @@
             </div>
             
             <div class="form-group">
-              <label class="label" for="payment_method">Forma de Pago</label>
-              <select id="payment_method" class="select" bind:value={completeForm.payment_method}>
+              <label class="label">Método de Pago</label>
+              <select class="select" bind:value={completeForm.payment_method}>
                 {#each paymentMethods as method}
                   <option value={method.value}>{method.label}</option>
                 {/each}
@@ -809,20 +809,18 @@
             </div>
             
             <div class="form-group">
-              <label class="label" for="reference">Referencia</label>
+              <label class="label">Referencia (Opcional)</label>
               <input 
-                id="reference" 
                 type="text" 
                 class="input" 
-                placeholder="Número de transacción, folio..." 
+                placeholder="Ej: No. Transferencia, Últimos 4 dígitos tarjeta" 
                 bind:value={completeForm.reference} 
               />
             </div>
             
             <div class="form-group">
-              <label class="label" for="notes">Notas</label>
+              <label class="label">Notas de cierre</label>
               <textarea 
-                id="notes" 
                 class="textarea" 
                 rows="2" 
                 bind:value={completeForm.notes}
@@ -830,10 +828,10 @@
             </div>
           </div>
           
-          <div class="modal-footer">
+          <div class="custom-modal-footer">
             <button class="btn btn-outline" on:click={() => showCompleteModal = false}>Cancelar</button>
             <button class="btn btn-success" on:click={completeRepair}>
-              ✅ Completar y Cobrar
+              Completar y Cobrar
             </button>
           </div>
         </div>

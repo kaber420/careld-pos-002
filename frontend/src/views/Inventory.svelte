@@ -335,17 +335,17 @@
 
   <!-- Modal Form -->
   {#if showForm}
-    <div class="modal-overlay" on:click|self={closeForm}>
-      <div class="modal modal-lg">
-        <div class="modal-header">
-          <h3 class="modal-title">
+    <div class="custom-modal-overlay" on:click|self={closeForm}>
+      <div class="custom-modal modal-lg">
+        <div class="custom-modal-header">
+          <h3 class="custom-modal-title">
             {editingItem ? 'Editar Item' : 'Nuevo Item de Inventario'}
           </h3>
-          <button class="modal-close" on:click={closeForm}>×</button>
+          <button class="custom-modal-close" on:click={closeForm}>×</button>
         </div>
 
         <form on:submit|preventDefault={handleSubmit}>
-          <div class="modal-body">
+          <div class="custom-modal-body">
             <div class="form-row">
               <div class="form-group">
                 <label class="label" for="name">Nombre *</label>
@@ -410,7 +410,7 @@
             </div>
           </div>
 
-          <div class="modal-footer">
+          <div class="custom-modal-footer">
             <button type="button" class="btn btn-outline" on:click={closeForm}>Cancelar</button>
             <button type="submit" class="btn btn-primary">
               {editingItem ? 'Actualizar' : 'Crear'} Item
@@ -423,17 +423,17 @@
 
   <!-- Adjustment Modal -->
   {#if showAdjustmentModal}
-    <div class="modal-overlay" on:click|self={closeAdjustmentModal}>
-      <div class="modal">
-        <div class="modal-header">
-          <h3 class="modal-title">
+    <div class="custom-modal-overlay" on:click|self={closeAdjustmentModal}>
+      <div class="custom-modal">
+        <div class="custom-modal-header">
+          <h3 class="custom-modal-title">
             Ajustar Stock: {adjustingItem?.name}
           </h3>
-          <button class="modal-close" on:click={closeAdjustmentModal}>×</button>
+          <button class="custom-modal-close" on:click={closeAdjustmentModal}>×</button>
         </div>
 
         <form on:submit|preventDefault={submitAdjustment}>
-          <div class="modal-body">
+          <div class="custom-modal-body">
             <div class="form-group">
               <label class="label" for="adj_quantity">Cantidad (+ para agregar, - para restar) *</label>
               <input id="adj_quantity" type="number" class="input" bind:value={adjustmentData.quantity} required />
@@ -457,7 +457,7 @@
             </div>
           </div>
 
-          <div class="modal-footer">
+          <div class="custom-modal-footer">
             <button type="button" class="btn btn-outline" on:click={closeAdjustmentModal}>Cancelar</button>
             <button type="submit" class="btn btn-primary">
               Guardar Ajuste

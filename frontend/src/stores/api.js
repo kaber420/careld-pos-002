@@ -183,7 +183,11 @@ export const api = {
   },
 
   async getPartnerRepairs() {
-    return request('/repairs/partner/my-devices');
+    return request('/partners/repairs');
+  },
+
+  async getPartnerDevices() {
+    return request('/partners/devices');
   },
 
   async getRepair(id) {

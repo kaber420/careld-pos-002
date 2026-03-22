@@ -42,6 +42,17 @@
     clearAuth();
     notify('Sesión cerrada correctamente', 'info');
   }
+
+  // Protección de rutas para socios
+  $: if ($isAuthenticated && $user && $user.role === 'partner') {
+    const restrictedPaths = ['/dashboard', '/customers', '/devices', '/repairs', '/inventory', '/pos', '/users', '/settings', '/partner-orders'];
+    const currentPath = window.location.pathname;
+    
+    if (restrictedPaths.some(path => currentPath === path || currentPath.startsWith(path + '/'))) {
+      notify('Acceso restringido. Redirigiendo a tu panel de socio.', 'warning');
+      navigate('/partner-dashboard', { replace: true });
+    }
+  }
 </script>
 
 {#if isLoading}
